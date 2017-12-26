@@ -2,18 +2,33 @@ import { Component, OnInit } from '@angular/core';
 import $ from 'jquery'
 import Hammer from 'hammerjs'
 import * as cornerstoneMath from 'cornerstone-math'
+import * as dicomParser from 'dicom-parser'
 // Cornerstone Libraries
 import * as cornerstone from 'cornerstone-core/dist/cornerstone.js'
 import * as cornerstoneTools from 'cornerstone-tools'
-import * as cornerstoneWebImageLoader from 'cornerstone-web-image-loader'
+import * as cornerstoneWADOImageLoader from 'cornerstone-wado-image-loader'
+//import * as cornerstoneWebImageLoader from 'cornerstone-web-image-loader'
 
 cornerstoneTools.external.$ = $
 cornerstoneTools.external.Hammer = Hammer
 cornerstoneTools.external.cornerstone = cornerstone
 cornerstoneTools.external.cornerstoneMath = cornerstoneMath
-cornerstoneWebImageLoader.external.$ = $
-cornerstoneWebImageLoader.external.cornerstone = cornerstone
-cornerstoneWebImageLoader.external.cornerstoneMath = cornerstoneMath
+
+//cornerstoneWebImageLoader.external.$ = $
+//cornerstoneWebImageLoader.external.cornerstone = cornerstone
+//cornerstoneWebImageLoader.external.cornerstoneMath = cornerstoneMath
+
+cornerstoneWADOImageLoader.external.cornerstone = cornerstone
+
+var config = {
+  webWorkerPath : '/assets/cornerstoneWADOImageLoaderWebWorker.js',
+  taskConfiguration: {
+      'decodeTask' : {
+          codecsPath: '/assets/cornerstoneWADOImageLoaderCodecs.js'
+      }
+  }
+};
+cornerstoneWADOImageLoader.webWorkerManager.initialize(config);
 
 @Component({
   selector: 'app-cornerstone',
@@ -32,7 +47,8 @@ export class CornerstoneComponent implements OnInit {
         // The webImageLoader uses this to make an xhr request to fetch an image
         // Under the hood, it creates a cornerstone "Image" object needed for display
         const imageUrl = 'https://rawgit.com/dannyrb/cornerstone-vuejs-poc/master/static/simple-study/1.2.276.0.74.3.1167540280.200511.112514.1.1.10.jpg'
-        cornerstone.loadImage(imageUrl).then(function (image) {
+        const wadoImageUrl = 'wadouri:https://www.asteris.biz/Keystone/ImageDownload.aspx?ClinicCode=TESTKEYSTONE&ImageId=e9833676-1895-1f7c-1117-ffffff171206&ImageType=DicomImage&FrameIndex=0'
+        cornerstone.loadImage(wadoImageUrl).then(function (image) {
           // Display our loaded image on the target canvas
           cornerstone.displayImage(canvas, image)
 
